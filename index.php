@@ -31,6 +31,8 @@ Image to analyze:
 			<tbody>
 						<?php
 						do {
+							
+							$result = $blobClient->listBlobs($containerName);
 							foreach ($result->getBlobs() as $blob) {
 						?>						
 						<tr>
