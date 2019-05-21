@@ -14,7 +14,7 @@
 </head>
 <body>
 Image to analyze:
- <form action="upload_foto.php" method="post" enctype="multipart/form-data">
+ <form action="index.php" method="post" enctype="multipart/form-data">
  <input type="file" name="fileToUpload" accept=".jpeg,.jpg,.png" required="">
  <input type="submit" name="submit" value="Upload">
  </form>
@@ -77,7 +77,7 @@ if (isset($_POST['submit'])) {
 	echo fread($content, filesize($fileToUpload));
 		
 	$blobClient->createBlockBlob($containerName, $fileToUpload, $content);
-	header("Location: upload_foto.php");
+	header("Location: index.php");
 }	
 	
 $listBlobsOptions = new ListBlobsOptions();
