@@ -14,7 +14,7 @@
 </head>
 <body>
 Image to analyze:
- <form action="index.php" method="post" enctype="multipart/form-data">
+ <form action="index.php" method="index.php?submit&containerName=<?php echo $containerName; ?>" enctype="multipart/form-data">
  <input type="file" name="fileToUpload" accept=".jpeg,.jpg,.png" required="">
  <input type="submit" name="submit" value="Upload">
  </form>
@@ -29,12 +29,7 @@ Image to analyze:
 			</tr>
 		
 			<tbody>
-						<?php
-						do {
-							
-							$result = $blobClient->listBlobs($containerName);
-							foreach ($result->getBlobs() as $blob) {
-						?>						
+												
 						<tr>
 							<td><?php echo $blob->getName() ?></td>
 							<td><?php echo $blob->getUrl() ?></td>
@@ -45,10 +40,6 @@ Image to analyze:
 								</form>
 							</td>
 						</tr>
-						<?php
-							} $listBlobsOptions->setContinuationToken($result->getContinuationToken());
-						} while($result->getContinuationToken());
-						?>
 					</tbody>	
  </table>
 </body>
@@ -71,20 +62,31 @@ use MicrosoftAzure\Storage\Blob\Models\PublicAccessType;
 $connectionString = "DefaultEndpointsProtocol=https;AccountName=newazure2;AccountKey=yXxKnsc1H1xDfyouvv6E2CbH6PZrerYlhwuDtS5ODOvAEinbjw5W3TGZNMrXncW24IBf1M8bFJS+zDaE3rEUAw==;EndpointSuffix=core.windows.net";
 $blobClient = BlobRestProxy::createBlobService($connectionString);
 
-$containerName = "newazure";
 	
 if (isset($_POST['submit'])) {
+	
+	$containerName = "newazure";
+	
 	$fileToUpload = $_FILES["fileToUpload"]["name"];
 	$content = fopen($_FILES["fileToUpload"]["tmp_name"], "r");
 	echo fread($content, filesize($fileToUpload));
 		
 	$blobClient->createBlockBlob($containerName, $fileToUpload, $content);
 	header("Location: index.php");
-}	
 	
-$listBlobsOptions = new ListBlobsOptions();
-$listBlobsOptions->setPrefix("");
-$result = $blobClient->listBlobs($containerName, $listBlobsOptions);
+	$listBlobsOptions = new ListBlobsOptions();
+	$listBlobsOptions->setPrefix("");
+	
+	do{
+            $result = $blobClient->listBlobs($containerName, $listBlobsOptions);
+            foreach ($result->getBlobs() as $blob)
+            {
+                echo $blob->getName().": ".$blob->getUrl()."<br />";
+            }
+        
+            $listBlobsOptions->setContinuationToken($result->getContinuationToken());
+        } while($result->getContinuationToken());
+}	
 ?>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
