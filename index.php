@@ -11,31 +11,20 @@ use MicrosoftAzure\Storage\Blob\Models\PublicAccessType;
 $connectionString = "DefaultEndpointsProtocol=https;AccountName=newazure2;AccountKey=yXxKnsc1H1xDfyouvv6E2CbH6PZrerYlhwuDtS5ODOvAEinbjw5W3TGZNMrXncW24IBf1M8bFJS+zDaE3rEUAw==;EndpointSuffix=core.windows.net";
 $blobClient = BlobRestProxy::createBlobService($connectionString);
 
+$containerName = "newazure2";
 	
 if (isset($_POST['submit'])) {
-	
-	$containerName = "newazure2".generateRandomString();
-	
 	$fileToUpload = $_FILES["fileToUpload"]["name"];
 	$content = fopen($_FILES["fileToUpload"]["tmp_name"], "r");
 	echo fread($content, filesize($fileToUpload));
 		
 	$blobClient->createBlockBlob($containerName, $fileToUpload, $content);
-	header("Location: index.php");
-	
-	$listBlobsOptions = new ListBlobsOptions();
-	$listBlobsOptions->setPrefix("");
-	
-	do{
-            $result = $blobClient->listBlobs($containerName, $listBlobsOptions);
-            foreach ($result->getBlobs() as $blob)
-            {
-                echo $blob->getName().": ".$blob->getUrl()."<br />";
-            }
-        
-            $listBlobsOptions->setContinuationToken($result->getContinuationToken());
-        } while($result->getContinuationToken());
+	header("Location: upload_foto.php");
 }	
+	
+$listBlobsOptions = new ListBlobsOptions();
+$listBlobsOptions->setPrefix("");
+$result = $blobClient->listBlobs($containerName, $listBlobsOptions);
 ?>
 
 
@@ -71,6 +60,10 @@ Image to analyze:
 		
 			<tbody>
 												
+						<?php
+						do {
+							foreach ($result->getBlobs() as $blob) {
+						?>						
 						<tr>
 							<td><?php echo $blob->getName() ?></td>
 							<td><?php echo $blob->getUrl() ?></td>
@@ -81,6 +74,10 @@ Image to analyze:
 								</form>
 							</td>
 						</tr>
+						<?php
+							} $listBlobsOptions->setContinuationToken($result->getContinuationToken());
+						} while($result->getContinuationToken());
+						?>
 					</tbody>	
  </table>
 </body>
