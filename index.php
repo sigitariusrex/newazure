@@ -44,7 +44,7 @@ $result = $blobClient->listBlobs($containerName, $listBlobsOptions);
 </head>
 <body>
 Image to analyze:
- <form action="index.php" method="POST" enctype="multipart/form-data">
+ <form action="index.php" method="post" enctype="multipart/form-data">
  <input type="file" name="fileToUpload" accept=".jpeg,.jpg,.png" required="">
  <input type="submit" name="submit" value="Upload">
  </form>
