@@ -19,7 +19,7 @@ if (isset($_POST['submit'])) {
 	echo fread($content, filesize($fileToUpload));
 		
 	$blobClient->createBlockBlob($containerName, $fileToUpload, $content);
-	header("Location: upload_foto.php");
+	header("Location: index.php");
 }	
 	
 $listBlobsOptions = new ListBlobsOptions();
@@ -68,7 +68,7 @@ Image to analyze:
 							<td><?php echo $blob->getName() ?></td>
 							<td><?php echo $blob->getUrl() ?></td>
 							<td>
-								<form action="analyze.php" method="post">
+								<form action="analisis.php" method="post">
 									<input type="hidden" name="url" value="<?php echo $blob->getUrl()?>">
 									<input type="submit" name="submit" value="Lihat" class="btn btn-primary">
 								</form>
