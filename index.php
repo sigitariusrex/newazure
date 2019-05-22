@@ -1,3 +1,44 @@
+<?php
+require_once 'vendor/autoload.php';
+require_once "./random_string.php";
+
+use MicrosoftAzure\Storage\Blob\BlobRestProxy;
+use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
+use MicrosoftAzure\Storage\Blob\Models\ListBlobsOptions;
+use MicrosoftAzure\Storage\Blob\Models\CreateContainerOptions;
+use MicrosoftAzure\Storage\Blob\Models\PublicAccessType;
+
+$connectionString = "DefaultEndpointsProtocol=https;AccountName=newazure2;AccountKey=yXxKnsc1H1xDfyouvv6E2CbH6PZrerYlhwuDtS5ODOvAEinbjw5W3TGZNMrXncW24IBf1M8bFJS+zDaE3rEUAw==;EndpointSuffix=core.windows.net";
+$blobClient = BlobRestProxy::createBlobService($connectionString);
+
+	
+if (isset($_POST['submit'])) {
+	
+	$containerName = "newazure2".generateRandomString();
+	
+	$fileToUpload = $_FILES["fileToUpload"]["name"];
+	$content = fopen($_FILES["fileToUpload"]["tmp_name"], "r");
+	echo fread($content, filesize($fileToUpload));
+		
+	$blobClient->createBlockBlob($containerName, $fileToUpload, $content);
+	header("Location: index.php");
+	
+	$listBlobsOptions = new ListBlobsOptions();
+	$listBlobsOptions->setPrefix("");
+	
+	do{
+            $result = $blobClient->listBlobs($containerName, $listBlobsOptions);
+            foreach ($result->getBlobs() as $blob)
+            {
+                echo $blob->getName().": ".$blob->getUrl()."<br />";
+            }
+        
+            $listBlobsOptions->setContinuationToken($result->getContinuationToken());
+        } while($result->getContinuationToken());
+}	
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -45,49 +86,6 @@ Image to analyze:
 </body>
 </html>
 
-
-
-
-
-<?php
-require_once 'vendor/autoload.php';
-require_once "./random_string.php";
-
-use MicrosoftAzure\Storage\Blob\BlobRestProxy;
-use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
-use MicrosoftAzure\Storage\Blob\Models\ListBlobsOptions;
-use MicrosoftAzure\Storage\Blob\Models\CreateContainerOptions;
-use MicrosoftAzure\Storage\Blob\Models\PublicAccessType;
-
-$connectionString = "DefaultEndpointsProtocol=https;AccountName=newazure2;AccountKey=yXxKnsc1H1xDfyouvv6E2CbH6PZrerYlhwuDtS5ODOvAEinbjw5W3TGZNMrXncW24IBf1M8bFJS+zDaE3rEUAw==;EndpointSuffix=core.windows.net";
-$blobClient = BlobRestProxy::createBlobService($connectionString);
-
-	
-if (isset($_POST['submit'])) {
-	
-	$containerName = "newazure2".generateRandomString();
-	
-	$fileToUpload = $_FILES["fileToUpload"]["name"];
-	$content = fopen($_FILES["fileToUpload"]["tmp_name"], "r");
-	echo fread($content, filesize($fileToUpload));
-		
-	$blobClient->createBlockBlob($containerName, $fileToUpload, $content);
-	header("Location: index.php");
-	
-	$listBlobsOptions = new ListBlobsOptions();
-	$listBlobsOptions->setPrefix("");
-	
-	do{
-            $result = $blobClient->listBlobs($containerName, $listBlobsOptions);
-            foreach ($result->getBlobs() as $blob)
-            {
-                echo $blob->getName().": ".$blob->getUrl()."<br />";
-            }
-        
-            $listBlobsOptions->setContinuationToken($result->getContinuationToken());
-        } while($result->getContinuationToken());
-}	
-?>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
