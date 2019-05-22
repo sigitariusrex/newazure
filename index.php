@@ -65,7 +65,7 @@ $blobClient = BlobRestProxy::createBlobService($connectionString);
 	
 if (isset($_POST['submit'])) {
 	
-	$containerName = "newazure".generateRandomString();
+	$containerName = "newazure2".generateRandomString();
 	
 	$fileToUpload = $_FILES["fileToUpload"]["name"];
 	$content = fopen($_FILES["fileToUpload"]["tmp_name"], "r");
